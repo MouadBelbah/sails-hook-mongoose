@@ -118,9 +118,8 @@ module.exports = function (sails) {
         // Expose `sails.mongoose`.
         // (note that it's important to do this _before_ the other stuff below so that it is accessible for use in custom
         //  `constructSchema` interceptor functions, in case any of those are being used)
+        mongoose.Promise=global.Promise
         sails.mongoose = mongoose;
-
-
         // Connect to the configured database using Mongoose.
         // (note that there is no callback:  this seems to be ok though.  Mongoose docs state that operations begun before
         //  a connection is established will be queued and replayed.)
@@ -128,7 +127,7 @@ module.exports = function (sails) {
         // We save a reference to this Mongoose db connection, and listen for the first error emitted from it.
         // (any subsequent error events emitted that are emitted will crash the server!)
         var dbConnection = sails.mongoose.connect(sails.config.mongoose.uri, sails.config.mongoose.connectionOpts).connection;
-        dbConnection.once('error', function (err){
+        dbConnection.on('error', function (err){
 
           // Handle weird (and very unlikely) case where Mongoose emits an error event without sending an Error instance as the event data.
           if ( !err ) {
